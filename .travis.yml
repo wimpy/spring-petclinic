@@ -1,2 +1,25 @@
 language: java
 jdk: oraclejdk8
+sudo: required
+services:
+  - docker
+cache:
+  directories:
+  - $HOME/.m2
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer
+    - oracle-java8-set-default
+install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+script:
+  - ./mvnw package
+  - ./deploy/deploy.sh
+env:
+  global:
+    - secure: "M/P8gVSSOIe9XAn0IvbWf/hWzEhEQHRaQJu9LoUp5PCI2SJAzq8SXjVsWIUP6iO8wD95apbJhMXp3kGvVHo0nSKbjs39J9qbFnx+1TYFAF59rlniZAoocFo3RlabyV8RJq1sUPgVo8RBTh9JI+4eiq5y2r4FJx8CLB1ccwPGu9buh2YO8mXCYxfl624RBenq+Vu4/Yk92wrvBD5LQwBqSg/5w1DRnSdRM4Gh5vitkzUpnRzU3dNHOis9ld9+JnI/s6Q5vvAslAh6DHqOR/SbyxYbEzMB2/i9hI5dET4+P9icWGTWIwJbg8i+gzCy7g0QI0bK6z9LGckd6py/ktfG8U6vVkoJvjR3WW12mj+lJAhCeafBKrNv88SttwTudd0WWWoU6wCbycpvg3XfgzDQjOF4HXh0ViVAf6CDxyMCxxAfP7cB4HGABY0q51Jcs+CmRTkS2D0rFLNUgXQrX13IPc/Yd7DxEd1VpnvPdVlBwqS1T05blg0FpY1hBvimcRZEjepWQ9OMLnqtQrU5x4mCmpuJ+uCbvrdwXtg5Jjm1wvUNG8vWmQSYRulotrOr20ecXGao6ebZ2cilYtjdAIFxIJAhqd/mVfLUv6+N3binSYjJ4QeVsIR9ibYzLmRPudFl4xcztzoKdLfeoSuSHC5w/gW/DKlYwe9dYthDho2zyhY=" # VAULT_PASSWORD
+    - secure: "mucjfV5H3Y+WJTQDdjwimFNFjPeAqPFuBfwmKTOrLX4EyG5/lG4pYaHKL0RIf4iekG8g1lwf0+cKm7jdzTXWSXg0o6uHgc8wjhRz/WeSmg+8D0gf9tOM1/mjLoYoRNwtVb5u9e0pJS/nGKIyxijTja5pgDykik2sZWG2eur8/WY5iJ0rrrcO9I+e3Gp7EAleIVWlLacEgTaNju7cjMAIW4TmhLQxC/SjU/2J1cxo/YaHHQv8Lk/bXXKX2nOvFg1QDdO9peDg+wZb6wLfhhKBWb2fiQZM97toOog53M8stTFQp3KOTVTIj8+Z4YgShuDScgQFFjHlw+nUbKomU3mDoM2ZAfPQZykj6XREnjwviTX9YmDZ1tKVDoLaLRTfwkvhNr4Pdi+a/yU2ef0ASoTZbp2s56JwZS44ExS0RtaNERZXLkw4p6+A7Q3Lvn5fuBO3LdY8s9Uk8tKOQ1AW2ighxpZ9svz+WnYZayUeWR3Me09fi9GGdFuzFQCDxpGSsK144CJwtyUlMzjK3oPi9k9/K0CpPG8hiF3LEIONXi9K/KriDYPEiUyTkYgLH+rTtLiz9awSz+XD6ODtGgnzgcdtEbboPJHg/fJRLKNn43e6TZKHgqJ2CeNfT85al+Pm/51zmIiw434xJfTQ8sqk10hCrnfY9Dh3in6979fyh9HMjOo=" # AWS_ACCESS_KEY_ID
+    - secure: "gaFsML8YYjahDtZyiYDeMhJvMR7iksKyLz16JmYNZAepgE9GuqLFZATy6tGcyEutsU0ji/ogBLVjtm+i8VH+Q5YopwCCydQ6plM+xMyugCgpvjzYgi4wk0n+PaJVFrloKMBB3bGFE3XHU05bLQaXq8C9FFDCyAuo6XrM8LkveVoKypnbkyf5Vm98bz9bME4V8xpTKszRaMYvqpgvfvMhzIh7oo9ca4dsbEXSoK909hdPhzLwDKZd3FrN/fRJsufyhrv9GC68wKX98LIislBwmp91/lsCFnGvP/nbQZXjfbBn2zU7BXMHKnnmThNmMWoZSp/OesMamrMPT0UYDXlFSvo1ok0vwOCOdmwrsVoWUt4UxFtivAoUcLdRw3gds8GZLI8Gjxlmqu5o3b2P2r369HXV5TCgRH7AWv/26CqDpeouEJw+xqqmQ131nmzJ6/hggBISNFin4Lma0K22yfps82vS9TcBphRCF/INloQefTeGmRb5cIKMViJqOEn717cXUUmo16lf+GjPj7lLnS5XxBvobXnliMo+kJm5+fJm2+MPEBz5ltqydxk5z3tqZVhOLW5Z+MSidcvKTWlr0XuBsxXW4jvrX1m8nJdGw7CLQSpZm7RQaPHqTao/dUP6ZhifIRYUH3BA/PUVclvKgHlwapVbsbITR2JXssK9q/4H/x8=" # AWS_SECRET_ACCESS_KEY
+

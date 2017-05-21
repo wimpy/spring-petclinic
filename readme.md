@@ -1,105 +1,59 @@
-# Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=master)](https://travis-ci.org/spring-projects/spring-petclinic/)
+# Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/wimpy/spring-petclinic.png?branch=master)](https://travis-ci.org/wimpy/spring-petclinic/)
+This is a fork of [the Spring PetClinic project](https://github.com/spring-projects/spring-petclinic) to show how to deploy an application [using Wimpy](https://wimpy.github.io/docs/).
+Every push/merge to this repository ends up in Travis deploying the application.
 
-## Understanding the Spring Petclinic application with a few diagrams
-<a href="https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application">See the presentation here</a>
+## Configuration
+The deploy folder contains the deployment configuration where we setup the basic Wimpy configuration
 
-## Running petclinic locally
-```
-	git clone https://github.com/spring-projects/spring-petclinic.git
-	cd spring-petclinic
-	./mvnw spring-boot:run
-```
-
-You can then access petclinic here: http://localhost:8080/
-
-<img width="1042" alt="petclinic-screenshot" src="https://cloud.githubusercontent.com/assets/838318/19727082/2aee6d6c-9b8e-11e6-81fe-e889a5ddfded.png">
-
-## In case you find a bug/suggested improvement for Spring Petclinic
-Our issue tracker is available here: https://github.com/spring-projects/spring-petclinic/issues
-
-
-## Database configuration
-
-In its default configuration, Petclinic uses an in-memory database (HSQLDB) which
-gets populated at startup with data. A similar setup is provided for MySql in case a persistent database configuration is needed.
-Note that whenever the database type is changed, the data-access.properties file needs to be updated and the mysql-connector-java artifact from the pom.xml needs to be uncommented.
-
-You could start a MySql database with docker:
+```yaml
+- hosts: localhost
+  connection: local
+  vars_files:
+    - "{{ playbook_dir }}/{{ wimpy_deployment_environment }}.yml"
+  vars:
+    # Application name
+    wimpy_application_name: "spring-petclinic"
+    # Port where our application is listening for requests
+    wimpy_application_port: 8080
+    # Endpoint where actuator exposes the health check
+    wimpy_aws_elb_healthcheck_ping_path: "/manage/health"
+  roles:
+    - role: wimpy.environment
+    - role: wimpy.build
+    - role: wimpy.deploy
 
 ```
-docker run -e MYSQL_ROOT_PASSWORD=petclinic -e MYSQL_DATABASE=petclinic -p 3306:3306 mysql:5.7.8
+
+Since we want to have different configuration values depending on the environment where we deploy, we load a different config file based on the `wimpy_deployment_environment` parameter.
+We may store secrets in these config files, so we have encrypted them using Ansible Vault.
+The password for Ansible Vault is passed in the .travis.yml file as an encrypted environment variable.
+
+## Continuous Deployment
+The [deploy folder](deploy) also contains a [deploy.sh](deploy/deploy.sh) script that gets executed in Travis for every merge/push to `master`.
+Although we don't recommend it, you can execute the script from your terminal to deploy without going through Travis.
+
+## Docker
+Wimpy will deploy the application using Docker, so we need to provide [a valid Dockerfile](Dockerfile) to build an image for the application.
+We make use of Docker multi stage build system to first generate the application JAR file using Maven, and then build the application Docker image using a minimal alpine based image with Java8.
+ 
+```
+FROM maven:3.5-jdk-8-alpine as BUILD
+
+COPY . /usr/src/app
+RUN mvn -f /usr/src/app/pom.xml clean package
+
+FROM openjdk:8-jdk-alpine
+
+COPY --from=BUILD /usr/src/app/target/*.jar /opt/app.jar
+WORKDIR /opt
+CMD ["java", "-jar", "app.jar"]
+
 ```
 
-## Working with Petclinic in Eclipse/STS
+That [Dockerfile](Dockerfile) is valid for any Maven application that runs on Java8.
+You can test the Docker image locally in your computer
 
-### prerequisites
-The following items should be installed in your system:
-* Maven 3 (http://www.sonatype.com/books/mvnref-book/reference/installation.html)
-* git command line tool (https://help.github.com/articles/set-up-git)
-* Eclipse with the m2e plugin (m2e is installed by default when using the STS (http://www.springsource.org/sts) distribution of Eclipse)
-
-Note: when m2e is available, there is an m2 icon in Help -> About dialog.
-If m2e is not there, just follow the install process here: http://eclipse.org/m2e/download/
-
-
-### Steps:
-
-1) In the command line
+```bash
+$ docker build -t spring-petclinic .
+$ docker run --rm -p 8080:8080 spring-petclinic
 ```
-git clone https://github.com/spring-projects/spring-petclinic.git
-```
-2) Inside Eclipse
-```
-File -> Import -> Maven -> Existing Maven project
-```
-
-
-## Looking for something in particular?
-
-|Spring Boot Configuration | Class or Java property files  |
-|--------------------------|---|
-|The Main Class | [PetClinicApplication](https://github.com/spring-projects/spring-petclinic/blob/master/src/main/java/org/springframework/samples/petclinic/PetClinicApplication.java) |
-|Properties Files | [application.properties](https://github.com/spring-projects/spring-petclinic/blob/master/src/main/resources) |
-|Caching | [CacheConfig](https://github.com/spring-projects/spring-petclinic/blob/master/src/main/java/org/springframework/samples/petclinic/system/CacheConfig.java) |
-
-## Interesting Spring Petclinic branches and forks
-
-The Spring Petclinic master branch in the main
-[spring-projects](https://github.com/spring-projects/spring-petclinic)
-GitHub org is the "canonical" implementation, currently based on
-Spring Boot and Thymeleaf. There are quite a few forks in a special
-GitHub org [spring-petclinic](https://github.com/spring-petclinic). If
-you have a special interest in a different technology stack that could
-be used to implement the Pet Clinic then please join the community
-there.
-
-| Link | Main technologies |
-|----------------|-------------------|
-| [spring-framework-petclinic](https://github.com/spring-petclinic/spring-framework-petclinic) | Spring Framework XML configuration, JSP pages, 3 persistence layers: JDBC, JPA and Spring Data JPA |
-| [javaconfig branch](https://github.com/spring-petclinic/spring-framework-petclinic/tree/javaconfig) | Same frameworks as the [spring-framework-petclinic](https://github.com/spring-petclinic/spring-framework-petclinic) but with Java Configuration instead of XML |
-| [spring-petclinic-angular](https://github.com/spring-petclinic/spring-petclinic-angularjs) | AngularJS 1.x, Spring Boot and Spring Data JPA |
-| [spring-petclinic-microservices](https://github.com/spring-petclinic/spring-petclinic-microservices) | Distributed version of Spring Petclinic built with Spring Cloud |
-| [spring-petclinic-reactjs](https://github.com/spring-petclinic/spring-petclinic-reactjs) | ReactJS (with TypeScript) and Spring Boot |
-
-
-## Interaction with other open source projects
-
-One of the best parts about working on the Spring Petclinic application is that we have the opportunity to work in direct contact with many Open Source projects. We found some bugs/suggested improvements on various topics such as Spring, Spring Data, Bean Validation and even Eclipse! In many cases, they've been fixed/implemented in just a few days.
-Here is a list of them:
-
-| Name | Issue |
-|------|-------|
-| Spring JDBC: simplify usage of NamedParameterJdbcTemplate | [SPR-10256](https://jira.springsource.org/browse/SPR-10256) and [SPR-10257](https://jira.springsource.org/browse/SPR-10257) |
-| Bean Validation / Hibernate Validator: simplify Maven dependencies and backward compatibility |[HV-790](https://hibernate.atlassian.net/browse/HV-790) and [HV-792](https://hibernate.atlassian.net/browse/HV-792) |
-| Spring Data: provide more flexibility when working with JPQL queries | [DATAJPA-292](https://jira.springsource.org/browse/DATAJPA-292) |
-
-
-# Contributing
-
-The [issue tracker](https://github.com/spring-projects/spring-petclinic/issues) is the preferred channel for bug reports, features requests and submitting pull requests.
-
-For pull requests, editor preferences are available in the [editor config](.editorconfig) for easy use in common text editors. Read more and download plugins at <http://editorconfig.org>.
-
-
-
-

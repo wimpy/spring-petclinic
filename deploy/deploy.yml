@@ -1,0 +1,14 @@
+---
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - "{{ playbook_dir }}/{{ wimpy_deployment_environment }}.yml"
+  vars:
+    wimpy_application_name: "spring-petclinic"
+    wimpy_application_port: 8080
+    wimpy_aws_elb_healthcheck_ping_path: "/manage/health"
+  roles:
+    - role: wimpy.environment
+    - role: wimpy.build
+    - role: wimpy.deploy
