@@ -17,22 +17,20 @@ install:
 jobs:
   include:
     - stage: Deploy to staging
-      install: skip
       script: ./deploy/deploy.sh staging
 
     - stage: Execute functional tests in staging
       install: skip
       script:
-        - exit 0
+        - curl "http://spring-petclinic.armesto.net/"
 
     - stage: Deploy to production
-      install: skip
       script: ./deploy/deploy.sh production
 
     - stage: Execute functional tests in production
       install: skip
       script:
-        - exit 0
+        - curl "http://spring-petclinic.armesto.net/"
 env:
   global:
     - secure: "M/P8gVSSOIe9XAn0IvbWf/hWzEhEQHRaQJu9LoUp5PCI2SJAzq8SXjVsWIUP6iO8wD95apbJhMXp3kGvVHo0nSKbjs39J9qbFnx+1TYFAF59rlniZAoocFo3RlabyV8RJq1sUPgVo8RBTh9JI+4eiq5y2r4FJx8CLB1ccwPGu9buh2YO8mXCYxfl624RBenq+Vu4/Yk92wrvBD5LQwBqSg/5w1DRnSdRM4Gh5vitkzUpnRzU3dNHOis9ld9+JnI/s6Q5vvAslAh6DHqOR/SbyxYbEzMB2/i9hI5dET4+P9icWGTWIwJbg8i+gzCy7g0QI0bK6z9LGckd6py/ktfG8U6vVkoJvjR3WW12mj+lJAhCeafBKrNv88SttwTudd0WWWoU6wCbycpvg3XfgzDQjOF4HXh0ViVAf6CDxyMCxxAfP7cB4HGABY0q51Jcs+CmRTkS2D0rFLNUgXQrX13IPc/Yd7DxEd1VpnvPdVlBwqS1T05blg0FpY1hBvimcRZEjepWQ9OMLnqtQrU5x4mCmpuJ+uCbvrdwXtg5Jjm1wvUNG8vWmQSYRulotrOr20ecXGao6ebZ2cilYtjdAIFxIJAhqd/mVfLUv6+N3binSYjJ4QeVsIR9ibYzLmRPudFl4xcztzoKdLfeoSuSHC5w/gW/DKlYwe9dYthDho2zyhY=" # VAULT_PASSWORD
