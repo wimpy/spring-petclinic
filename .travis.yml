@@ -16,20 +16,21 @@ install:
   - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
 jobs:
   include:
-    - stage: Build mvn application
-      script: ./mvnw package
-
     - stage: Deploy to staging
-      script: ./deploy/deploy.sh
+      install: skip
+      script: ./deploy/deploy.sh staging
 
     - stage: Execute functional tests in staging
+      install: skip
       script:
         - exit 0
 
     - stage: Deploy to production
-      script: DEPLOYMENT_ENVIRONMENT=production ./deploy/deploy.sh
+      install: skip
+      script: ./deploy/deploy.sh production
 
     - stage: Execute functional tests in production
+      install: skip
       script:
         - exit 0
 env:
