@@ -5,8 +5,8 @@ set -v
 VAULT_FILE="${PWD}/vault"
 DEPLOYMENT_ENVIRONMENT=${1:-staging}
 
-# Only execute deployment if $TRAVIS is null (we are not on CI) or we are on CI merging to master and the build has ended successfully
-if [[ -z "${TRAVIS}" ]] || [[ "${TRAVIS_PULL_REQUEST}" == "false" && "${TRAVIS_TEST_RESULT}" == 0 && "${TRAVIS_BRANCH}" == 'master' ]]; then
+# Only execute deployment if $TRAVIS is null (we are not on CI) or we are on CI merging to master
+if [[ -z "${TRAVIS}" ]] || [[ "${TRAVIS_PULL_REQUEST}" == "false"  && "${TRAVIS_BRANCH}" == 'master' ]]; then
   echo "${VAULT_PASSWORD}" > "${VAULT_FILE}"
   docker run --rm -it \
     -v /var/run/docker.sock:/var/run/docker.sock \
