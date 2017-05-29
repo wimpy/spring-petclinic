@@ -8,7 +8,4 @@
     wimpy_application_name: "spring-petclinic"
     wimpy_application_port: 8080
     wimpy_aws_elb_healthcheck_ping_path: "/manage/health"
-  roles:
-    - role: wimpy.environment
-    - role: wimpy.build
-    - role: wimpy.deploy
+  roles: "{{ roles }}"
